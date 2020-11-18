@@ -824,8 +824,8 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
 						yDisp = displacementNoisePerlin.GetNoise(realX, realZ+67.0f)*dispAmp;
 						zDisp = displacementNoisePerlin.GetNoise(realX, realZ+149.0f)*dispAmp;
 						
-						float hCompress = xzCompression;///16;///2;//(-realY/128);//+realY;
-						float vCompress = yCompression;///16;///2;//(-realY/128);//+realY;
+						float hCompress = xzCompression/caveSizeAtChunkY(chunkY);///16;///2;//(-realY/128);//+realY;
+						float vCompress = yCompression/caveSizeAtChunkY(chunkY);///16;///2;//(-realY/128);//+realY;
 						
 						// so the size of cave lasts for (size of cave)*128 chunks.
 						// size of cave = maximum(1, (chunkY))
@@ -1005,21 +1005,29 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
     }
     //------------------------------------------------------------------------------------------------------------
     
-//    private float caveSizeAtChunkY(int chunkY) {
-//    	chunkY = -chunkY;
-//    	float caveSize = 0f;
-//    	for(int y = 0; y < chunkY; y++) {
-//    		if()
-//    		{
-//    			
-//    		}
-//    		else
-//    		{
-//    			
-//    		}
-//    	}
-//    	return 1f;
-//    }
+    private float caveSizeAtChunkY(int chunkY) {
+    	chunkY = 4-chunkY;
+    	float caveSize = 0f;
+    	int y = 1;
+    	while(y < chunkY) {
+    		if(IsPowerOfTwo(y))
+    		{
+    			caveSize++;
+    			y += y*4;
+    		}
+    		else
+    		{
+    			caveSize++;
+    			y++;
+    		}
+    	}
+    	return caveSize;
+    }
+    
+    boolean IsPowerOfTwo(long x)
+    {
+        return (x != 0) && ((x & (x - 1)) == 0);
+    }
     
     //------------------------------------------------------------------------------------------------------------
 }
