@@ -1,0 +1,24 @@
+want y>0 == - & y<0 == +
+multiply noise image not noise itself
+
+
+
+
+
+
+
+things to implement after fixed everything:
+
+0. adjust values to make it work better and faster - lower the values certain ores start to spawn at, possibly make ores rarer, generate the caves better, add the randomness increaser thingy back in, possibly increase scale as you go down.
+1. integration with open terrain generator / biome bundle. somehow. probably by butchering up and attaching and modifying that one mod that generates vanilla from y=0 to y=256 and then does cubicgen for everything else.
+
+note: i can use mentioned mod above to just not bother doing any of the surface generator things, like adding villages.
+
+2. all vanilla generators:
+	a. mineshafts
+3. all modded generators:
+	a. ores & similarly generated things (such as destabilised redstone (liquid), for example)
+	b. vertical biomes (from quark or otherwise)
+	c. underground structures (such as quark's crystal caves or whatever)
+4. add scale the more you decend - eventually have massive caverns if you go down far enough?
+5. implement TMCW-like caves? shouldnt be too difficult as most of them are apparently just vanilla caves with different values. could generate in the walls of the caverns. could use the default cubicworldgen cave generator as a base for it.

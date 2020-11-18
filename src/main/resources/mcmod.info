@@ -1,0 +1,20 @@
+[
+    {
+        "modid": "cubicgen",
+        "name": "CubicGen",
+        "description": "CubicWorldGen + WorleyCaves badly stitched together",
+        "version": "${version}",
+        "mcversion": "${mcversion}",
+        "url": "",
+        "updateUrl": "",
+        "authorList": [
+            "Barteks2x",
+            "SuperFluke",
+            "booleanbyte",
+            "qwerty9118"
+        ],
+        "logoFile": "/assets/cubicchunks/logo.png",
+        "screenshots": [],
+        "dependencies": []
+    }
+]
