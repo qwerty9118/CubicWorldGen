@@ -1010,7 +1010,7 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
     	float caveSize = 0f;
     	int y = 1;
     	while(y < ypos) {
-    		if(IsPowerOfTwo(y))
+    		if(IsPowerOfTwo(y/16))
     		{
     			caveSize++;
     			y += y*64;
