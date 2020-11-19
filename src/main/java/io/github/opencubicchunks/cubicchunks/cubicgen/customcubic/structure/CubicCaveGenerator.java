@@ -824,8 +824,8 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
 						yDisp = displacementNoisePerlin.GetNoise(realX, realZ+67.0f)*dispAmp;
 						zDisp = displacementNoisePerlin.GetNoise(realX, realZ+149.0f)*dispAmp;
 						
-						float hCompress = xzCompression/caveSizeAtChunkY(chunkY);///16;///2;//(-realY/128);//+realY;
-						float vCompress = yCompression/caveSizeAtChunkY(chunkY);///16;///2;//(-realY/128);//+realY;
+						float hCompress = xzCompression/caveSizeAtY(realY);///16;///2;//(-realY/128);//+realY;
+						float vCompress = yCompression/caveSizeAtY(realY);///16;///2;//(-realY/128);//+realY;
 						
 						// so the size of cave lasts for (size of cave)*128 chunks.
 						// size of cave = maximum(1, (chunkY))
@@ -1005,19 +1005,19 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
     }
     //------------------------------------------------------------------------------------------------------------
     
-    private float caveSizeAtChunkY(int chunkY) {
-    	chunkY = 4-chunkY;
+    private float caveSizeAtY(int ypos) {
+    	ypos = 64-ypos;
     	float caveSize = 0f;
     	int y = 1;
-    	while(y < chunkY) {
+    	while(y < ypos) {
     		if(IsPowerOfTwo(y))
     		{
     			caveSize++;
-    			y += y*4;
+    			y += y*64;
     		}
     		else
     		{
-    			caveSize++;
+    			caveSize += 1/16;
     			y++;
     		}
     	}
