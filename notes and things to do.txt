@@ -1,6 +1,13 @@
-each layer = different biome
+randomly sized spheres that generate underground = different biomes
 generate top block of that biome as top block somehow (check biome above & generate the top block of that at the highest y? no. find lowest y of current chunk (unless its a 2^n chunk or unless it's above a certain cave size) and fill that with the top block of that biome and also generate the top block of stone as the top block of that biome somehow.
 can check where to start generating from using similar code to the cave caves.
+
+
+
+
+
+check if witch huts spawn
+
 
 
 

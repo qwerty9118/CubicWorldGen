@@ -169,6 +169,11 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
     private static final double CAVE_FLOOR_DEPTH = -0.7;
 
     private static final int RANGE = 8;
+    
+    /**
+     * 9118 - Maximum height that a cave will start generating at.
+     */
+    private static final long MAX_HEIGHT = -2000;
 
     /**
      * Controls which blocks can be replaced by cave
@@ -177,63 +182,56 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
             state.getBlock() == Blocks.STONE || state.getBlock() == Blocks.DIRT || state.getBlock() == Blocks.GRASS);
 
     @Override public void generate(World world, CubePrimer cube, CubePos cubePos) {
-//        this.generate(world, cube, cubePos, this::generate, RANGE, RANGE, 1, 1);
     	if(!worlInit) {
         	WorleyCaveGenerator();
         	worlInit = true;
     	}
     	
     	generate2(world, cube, cubePos);
+    	this.generate(world, cube, cubePos, this::generate, RANGE, RANGE, 1, 1);
     }
     
     boolean worlInit = false;
 
     protected void generate(World world, Random rand, CubePrimer cube,
             int cubeXOrigin, int cubeYOrigin, int cubeZOrigin, CubePos generatedCubePos) {
-//        if (rand.nextInt(CAVE_RARITY) != 0) {
-//            return;
-//        }
-//        //very low probability of generating high number
-//        int nodes = rand.nextInt(rand.nextInt(rand.nextInt(MAX_INIT_NODES + 1) + 1) + 1);
-//
-//        for (int node = 0; node < nodes; ++node) {
-//            double branchStartX = localToBlock(cubeXOrigin, rand.nextInt(ICube.SIZE));
-//            double branchStartY = localToBlock(cubeYOrigin, rand.nextInt(ICube.SIZE));
-//            double branchStartZ = localToBlock(cubeZOrigin, rand.nextInt(ICube.SIZE));
-//            int subBranches = 1;
-//
-//            if (rand.nextInt(LARGE_NODE_RARITY) == 0) {
-//                this.generateLargeNode(cube, rand, rand.nextLong(), generatedCubePos,
-//                        branchStartX, branchStartY, branchStartZ);
-//                subBranches += rand.nextInt(LARGE_NODE_MAX_BRANCHES);
-//            }
-//
-//            for (int branch = 0; branch < subBranches; ++branch) {
-//                float horizDirAngle = rand.nextFloat() * (float) Math.PI * 2.0F;
-//                float vertDirAngle = (rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
-//                float baseHorizSize = rand.nextFloat() * 2.0F + rand.nextFloat();
-//
-//                if (rand.nextInt(BIG_CAVE_RARITY) == 0) {
-//                    baseHorizSize *= rand.nextFloat() * rand.nextFloat() * 3.0F + 1.0F;
-//                }
-//
-//                int startWalkedDistance = 0;
-//                int maxWalkedDistance = 0;
-//                double vertCaveSizeMod = 1.0;
-//
-//                this.generateNode(cube, rand.nextLong(), generatedCubePos,
-//                        branchStartX, branchStartY, branchStartZ,
-//                        baseHorizSize, horizDirAngle, vertDirAngle,
-//                        startWalkedDistance, maxWalkedDistance, vertCaveSizeMod);
-//            }
-//        }
-    	
-    	if(!worlInit) {
-        	WorleyCaveGenerator();
-        	worlInit = true;
-    	}
-    	
-    	generate2(world, cube, generatedCubePos);
+        if (rand.nextInt(CAVE_RARITY) != 0 || generatedCubePos.getY() > MAX_HEIGHT/16) {
+            return;
+        }
+        //very low probability of generating high number //TODO: 9118 - do the 1.6.4 caves thing (or possibly above) (i think below is for the size of the caves, above is for chance of spawning a cave.
+        int nodes = rand.nextInt(rand.nextInt(rand.nextInt(MAX_INIT_NODES + 1) + 1) + 1);
+
+        for (int node = 0; node < nodes; ++node) {
+            double branchStartX = localToBlock(cubeXOrigin, rand.nextInt(ICube.SIZE));
+            double branchStartY = localToBlock(cubeYOrigin, rand.nextInt(ICube.SIZE));
+            double branchStartZ = localToBlock(cubeZOrigin, rand.nextInt(ICube.SIZE));
+            int subBranches = 1;
+
+            if (rand.nextInt(LARGE_NODE_RARITY) == 0) {
+                this.generateLargeNode(cube, rand, rand.nextLong(), generatedCubePos,
+                        branchStartX, branchStartY, branchStartZ);
+                subBranches += rand.nextInt(LARGE_NODE_MAX_BRANCHES);
+            }
+
+            for (int branch = 0; branch < subBranches; ++branch) {
+                float horizDirAngle = rand.nextFloat() * (float) Math.PI * 2.0F;
+                float vertDirAngle = (rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
+                float baseHorizSize = rand.nextFloat() * 2.0F + rand.nextFloat();
+
+                if (rand.nextInt(BIG_CAVE_RARITY) == 0) {
+                    baseHorizSize *= rand.nextFloat() * rand.nextFloat() * 3.0F + 1.0F;
+                }
+
+                int startWalkedDistance = 0;
+                int maxWalkedDistance = 0;
+                double vertCaveSizeMod = 1.0;
+
+                this.generateNode(cube, rand.nextLong(), generatedCubePos,
+                        branchStartX, branchStartY, branchStartZ,
+                        baseHorizSize, horizDirAngle, vertDirAngle,
+                        startWalkedDistance, maxWalkedDistance, vertCaveSizeMod);
+            }
+        }
     }
 
     /**
@@ -607,7 +605,8 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
 		
 //		this.world = worldIn;
 		this.generateWorleyCaves(worldIn, x, y, z, primer);
-	
+		
+		
 		if(logTime)
 		{
 			genTime[currentTimeIndex] = System.nanoTime() - start;//System.currentTimeMillis() - start;
@@ -626,7 +625,7 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
     {
 		int chunkMaxHeight = 256;
 		int seaLevel = worldIn.getSeaLevel();
-		float[][][] samples = sampleNoise(chunkX, chunkY, chunkZ, chunkMaxHeight+1);
+		float[][][] samples = sampleNoise(chunkX, chunkY, chunkZ, chunkMaxHeight+1, worldIn);
         float oneQuarter = 0.25F;
         float oneHalf = 0.5F;
         Biome currentBiome;
@@ -791,7 +790,7 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
 		}
     }
 	
-	public float[][][] sampleNoise(int chunkX, int chunkY, int chunkZ, int maxSurfaceHeight) 
+	public float[][][] sampleNoise(int chunkX, int chunkY, int chunkZ, int maxSurfaceHeight, World worldIn) 
 	{
 		int originalMaxHeight = 128;
 		float[][][] noiseSamples = new float[5][10][5];
@@ -814,8 +813,39 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
 					{
 						//Experiment making the cave system more chaotic the more you descend 
 						///TODO might be too dramatic down at lava level
-						///TODO 9118 - also make the caves larger
-						float dispAmp = 1;//(float) (warpAmplifier * ((originalMaxHeight-(realY/2))/(originalMaxHeight*0.85)));
+						///TODO 9118 - might need to divide the warpAmplifier by something.
+						float dispAmp = (float) ((2.6 * sineNoise1d(y/256)) + 5);// = (float) (warpAmplifier * sineNoise1d(y));//(float) (warpAmplifier * ((originalMaxHeight-(realY/2))/(originalMaxHeight*0.85)));
+						
+						BlockPos realPos = new BlockPos(realX, realY, realZ);
+						Biome currentBiome = worldIn.provider.getBiomeProvider().getBiome(realPos, Biomes.PLAINS);
+						
+						if(currentBiome == Biomes.EXTREME_HILLS || currentBiome == Biomes.EXTREME_HILLS_WITH_TREES)
+						{
+							dispAmp = (float) (8 * sineNoise1d(y));
+						}
+						else if(currentBiome == Biomes.MUTATED_EXTREME_HILLS || currentBiome == Biomes.MUTATED_EXTREME_HILLS_WITH_TREES)
+						{
+							dispAmp = (float) (Math.pow(8 * sineNoise1d(y), 2));
+						}
+						else if(currentBiome == Biomes.EXTREME_HILLS_EDGE)
+						{
+							dispAmp = (float) (4 * sineNoise1d(y));
+						}
+						else if(currentBiome == Biomes.PLAINS)
+						{
+							dispAmp = 0.1f;
+						}
+						
+						
+						
+						/*
+						else if(currentBiome == Biomes)
+						{
+							dispAmp = ;
+						}
+						*/
+						
+						
 						float xDisp = 0f;
 						float yDisp = 0f;
 						float zDisp = 0f;
@@ -824,15 +854,9 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
 						yDisp = displacementNoisePerlin.GetNoise(realX, realZ+67.0f)*dispAmp;
 						zDisp = displacementNoisePerlin.GetNoise(realX, realZ+149.0f)*dispAmp;
 						
-						float hCompress = xzCompression/caveSizeAtY(realY);///16;///2;//(-realY/128);//+realY;
-						float vCompress = yCompression/caveSizeAtY(realY);///16;///2;//(-realY/128);//+realY;
-						
-						// so the size of cave lasts for (size of cave)*128 chunks.
-						// size of cave = maximum(1, (chunkY))
-						// exponentially bigger - 
-						// for(i=0; i < x; i++)
-						// sum += 2^i
-						// log of 2
+						double caveSize = caveSizeAtY(realY);
+						float hCompress = xzCompression/(float) caveSize;
+						float vCompress = yCompression/(float) caveSize;
 						
 						float noiseCutoffMod = noiseCutoff;//Math.max((noiseCutoff+(realY/256)), noiseCutoff);
 						
@@ -1005,23 +1029,43 @@ public class CubicCaveGenerator implements ICubicStructureGenerator {
     }
     //------------------------------------------------------------------------------------------------------------
     
-    private float caveSizeAtY(int ypos) {
-    	ypos = 64-ypos;
-    	float caveSize = 0f;
-    	for(long y = 1; y < ypos; y++) {
-			caveSize += 1/16;
-			
-    		if(IsPowerOfTwo(y/16))
-    		{
-    			y += (y*4)-1;//+= y+1;
+    private double caveSizeAtY(int realY) {
+    	double ypos = -realY;
+    	double cave = 32; //9118 - this is 32 to try and reduce the slicing effect when going through a transition layer. it half worked. eh, good enough.
+    	
+    	//9118 - this finds the cave level at the current y. each power of 2 gets a long layer, the numbers between are grouped into "transition layers" which transition between the powers of 2 somewhat succesfully.
+    	for(long y = 0; y < ypos; cave += 1){ //9118 - i would've used an equation to do this, but it turned out that that was difficult and a for loop is easy.
+    		if(cave == 32 || isPowerOfTwo(cave/32)){
+    			y += cave*2;
+    		}
+    		else{
+    			y++;
     		}
     	}
-    	return caveSize;
+    	
+    	return cave/32;
     }
     
-    boolean IsPowerOfTwo(long i)
+    private boolean isPowerOfTwo(double i)
     {
-        return (i != 0) && ((i & (i - 1)) == 0);
+    	if(i % 1 != 0)
+    	{
+    		return false;
+    	};
+    	long j = (long) i;
+        return (j != 0) && ((j & (j - 1)) == 0);
+    }
+    
+    private double sineNoise1d(double x)
+    {
+    	double FactorE = -1.2;
+    	double ScaleE = -1.7;
+    	double FactorPi = 1.9;
+    	double ScalePi = 0.7;
+    	double Factor1 = -3.2;
+    	double Scale1 = -1.3;
+    	double FactorTotal = 0.3;
+    	return FactorTotal * (Factor1 * Math.sin(Scale1 * x) + FactorE * Math.sin(ScaleE * Math.E * x) + FactorPi * Math.sin(ScalePi * Math.PI * x));
     }
     
     //------------------------------------------------------------------------------------------------------------
